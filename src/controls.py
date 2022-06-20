@@ -21,7 +21,7 @@ def get_control(_control, _state):
                 state[i]["press"] = True
             else:
                 state[i]["press"] = False
-            
+
             state[i]["held"] = True
         else:
             state[i]["held"] = False
@@ -39,7 +39,7 @@ def def_controls():
                 state[i]["press"] = True
             else:
                 state[i]["press"] = False
-            
+
             state[i]["held"] = True
         else:
             state[i]["held"] = False
@@ -74,8 +74,8 @@ class Keyboard:
         return self.keys[key]
 
     def hold_time(self, key: int) -> float:
-        """"check for how long held key is pressed"""
-								
+        """ "check for how long held key is pressed"""
+
         if key in self.keys:
             return time.time() - self.keys[key]
 

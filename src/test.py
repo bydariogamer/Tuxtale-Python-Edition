@@ -1,6 +1,7 @@
 timer = 0
 autocon = 300
 
+
 class Testclass:
     def __init__(self, _x, _y, _arr=None):
         self.x = _x
@@ -11,6 +12,7 @@ class Testclass:
 
     def foo(self):
         print("testclass")
+
 
 animation = {
     "events": [
@@ -46,6 +48,7 @@ animation = {
     ]
 }
 
+
 class Attack:
     def __init__(self, _opponent, _timer=0):
         self.opponent = _opponent
@@ -67,6 +70,7 @@ class Attack:
                     # new_actor(object, x, y)
                     c = object(x, y, arr)
                     c.foo()
+
 
 for i in animation["events"]:
     if timer >= i["start"] and timer < i["stop"]:

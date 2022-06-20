@@ -1,6 +1,7 @@
 from .actors import *
 from .init import *
 
+
 def start_game():
     game.game_mode = game_play
     p = GameMap("res/map/test_for_PGE.json")

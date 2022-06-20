@@ -3,6 +3,7 @@ from .utils import *
 from .init import *
 import math
 
+
 def game_play():
     if game:
         # 1) UPDATE PHASE
@@ -70,7 +71,7 @@ def start_battle():
     new_actor(Soul, display_w / 2, display_H / 2, None, "actorlayer")
     c = Attack(Slime)
     game.attacks.append(c)
-    
+
     c.construct_attack(0, 100, 0, 20, 60, 10, 10, (2, -0.5))
     c.construct_attack(400, 100, 0, 20, 60, 10, 10, (-2, -0.5))
     c.construct_attack(0, 100, 0, 20, 120, 10, 10, (2, -0.5))
@@ -84,7 +85,7 @@ def battle_mode():
 
     game.cam_x = 0
     game.cam_y = 0
-    
+
     for i in game.attacks:
         i.run()
 
@@ -108,7 +109,7 @@ class GameMap:
     def draw_tiles(self):
         for i in self.mapdata["layers"]:
             game.actor[i["name"]] = []
-                            
+
             if i["type"] == "tilelayer":
                 data_iterator = 0
                 for y in range(0, i["height"]):
@@ -118,7 +119,11 @@ class GameMap:
                         if tile_id > 0:
                             tileset = self.get_tileset(tile_id)
 
-                            if i["name"] == "BG" or i["name"] == "FG" or i["name"] == "MG":
+                            if (
+                                i["name"] == "BG"
+                                or i["name"] == "FG"
+                                or i["name"] == "MG"
+                            ):
                                 new_actor(
                                     Sprite,
                                     x * 16,
@@ -126,7 +131,7 @@ class GameMap:
                                     [tileset[0], tile_id - tileset[1]],
                                     i["name"],
                                 )
-                            
+
                             if i["name"] == "solid":
                                 new_actor(
                                     Block,
@@ -144,9 +149,13 @@ class GameMap:
 
             if tileset_GID <= tile_GID < tileset_tile_count + tileset_GID:
                 image = self.mapdata["tilesets"][i]["image"]
-                return [pygame.image.load(image.replace("..", "res")).convert_alpha(), tileset_GID]
-        
+                return [
+                    pygame.image.load(image.replace("..", "res")).convert_alpha(),
+                    tileset_GID,
+                ]
+
         return [None, 0]
+
 
 class Physactor:
     def __init__(self, _x, _y):
@@ -162,6 +171,7 @@ class Physactor:
 
     def render(self):
         pass
+
 
 class Actor:
     id = 0
@@ -185,7 +195,7 @@ class Actor:
         self.frame = []
 
         # Are we sure pygame.Rect takes height as the 3rd parameter and width as the 4th parameter?
-        
+
         self.shape = pygame.Rect(self.x, self.y, self.w, self.h)
         self.solid = False
 
@@ -269,10 +279,10 @@ class Sprite(Actor):
             if len(self.arr) >= 1:
                 self.sprite_sheet = self.arr[0]
                 self.load_sprite(self.sprite_sheet)
-            
+
             if len(self.arr) >= 2:
                 self.index = self.arr[1]
-            
+
             if len(self.arr) >= 3:
                 self.size = self.arr[2]
                 self.load_sprite(self.spriteSheet, self.size[0], self.size[1])
@@ -327,21 +337,33 @@ class Slime(Actor):
         if game.game_player.shape.colliderect(self.shape):
             start_battle()
 
-        self.xspeed, self.yspeed = ((
-                    pygame.math.Vector2(game.game_player.shape.topleft) - pygame.math.Vector2(self.shape.topleft)
-        ).normalize() * 0.5).xy
+        self.xspeed, self.yspeed = (
+            (
+                pygame.math.Vector2(game.game_player.shape.topleft)
+                - pygame.math.Vector2(self.shape.topleft)
+            ).normalize()
+            * 0.5
+        ).xy
 
         # Attempt to move in the x-axis by xspeed
 
-        if collision_check(pygame.Rect(self.shape.x + self.xspeed, self.shape.y, self.shape.w, self.shape.h)):
+        if collision_check(
+            pygame.Rect(
+                self.shape.x + self.xspeed, self.shape.y, self.shape.w, self.shape.h
+            )
+        ):
             self.xspeed = 0
         else:
             self.x += self.xspeed
             self.shape.topleft = self.x, self.y
-        
+
         # Attempt to move in the y-axis by yspeed
 
-        if collision_check(pygame.Rect(self.shape.x, self.shape.y + self.yspeed, self.shape.w, self.shape.h)):
+        if collision_check(
+            pygame.Rect(
+                self.shape.x, self.shape.y + self.yspeed, self.shape.w, self.shape.h
+            )
+        ):
             self.yspeed = 0
         else:
             self.y += self.yspeed
@@ -378,10 +400,10 @@ class VerticallyMovingBlock(Actor):
         self.solid = True
         self.color = (200, 200, 200)
         self.frame_count = 0
-        
+
         if not self.arr:
             return
-        
+
         if self.arr.len() == 1:
             self.sprite_sheet = self.arr[0]
             self.load_sprite(self.sprite_sheet)
@@ -395,7 +417,9 @@ class VerticallyMovingBlock(Actor):
         self.shape.y = self.y
 
     def render(self):
-        draw_sprite(sprite_block, self.frame[0], self.x - game.cam_x, self.y - game.cam_y)
+        draw_sprite(
+            sprite_block, self.frame[0], self.x - game.cam_x, self.y - game.cam_y
+        )
 
     def typeof(self):
         return "Block"
@@ -428,10 +452,10 @@ class HorizontallyMovingBlock(Actor):
         self.solid = True
         self.color = (200, 200, 200)
         self.frame_count = 0
-        
+
         if not self.arr:
             return
-        
+
         if self.arr.len() == 1:
             self.sprite_sheet = self.arr[0]
             self.load_sprite(self.sprite_sheet)
@@ -445,7 +469,9 @@ class HorizontallyMovingBlock(Actor):
         self.shape.y = self.y
 
     def render(self):
-        draw_sprite(sprite_block, self.frame[0], self.x - game.cam_x, self.y - game.cam_y)
+        draw_sprite(
+            sprite_block, self.frame[0], self.x - game.cam_x, self.y - game.cam_y
+        )
 
     def typeof(self):
         return "Block"
@@ -484,35 +510,35 @@ class Block(Actor):
                 if self.sort == 0:
                     self.shape.w = 16
                     self.shape.h = 16
-                
+
                 if self.sort == 1:
                     self.shape.w = 16
                     self.shape.h = 8
-                
+
                 if self.sort == 2:
                     self.solid_offs_x = 0
                     self.solid_offs_y = 8
                     self.shape.w = 16
                     self.shape.h = 8
-                
+
                 if self.sort == 3:
                     self.solid_offs_x = 0
                     self.solid_offs_y = 0
                     self.shape.w = 8
                     self.shape.h = 16
-                
+
                 if self.sort == 4:
                     self.solid_offs_x = 8
                     self.solid_offs_y = 0
                     self.shape.w = 8
                     self.shape.h = 16
-            
+
             if len(self.arr) >= 2:
                 self.sort = self.arr[1]
-            
+
             if len(self.arr) >= 3:
                 self.solid = self.arr[2]
-                
+
                 if not self.solid:
                     self.color = (200, 200, 200, 90)
 
@@ -598,25 +624,38 @@ class Tux(Actor):
             self.anim = self.walk_down
             self.stand_still = self.stand_down
 
-        if keyboard.is_pressed(RIGHT) or keyboard.is_pressed(LEFT) or keyboard.is_pressed(UP) or keyboard.is_pressed(DOWN):
+        if (
+            keyboard.is_pressed(RIGHT)
+            or keyboard.is_pressed(LEFT)
+            or keyboard.is_pressed(UP)
+            or keyboard.is_pressed(DOWN)
+        ):
             self.step_count += 1
-            
+
             if self.step_count % 2 == 0:
                 self.frame_index = 1
             else:
                 self.frame_index = 3
 
         # Attempt to move in the x-axis by xspeed
-        
-        if collision_check(pygame.Rect(self.shape.x + self.xspeed, self.shape.y, self.shape.w, self.shape.h)):
+
+        if collision_check(
+            pygame.Rect(
+                self.shape.x + self.xspeed, self.shape.y, self.shape.w, self.shape.h
+            )
+        ):
             self.xspeed = 0
         else:
             self.x += self.xspeed
             self.shape.topleft = self.x, self.y
-        
+
         # Attempt to move in the y-axis by yspeed
-        
-        if collision_check(pygame.Rect(self.shape.x, self.shape.y + self.yspeed, self.shape.w, self.shape.h)):
+
+        if collision_check(
+            pygame.Rect(
+                self.shape.x, self.shape.y + self.yspeed, self.shape.w, self.shape.h
+            )
+        ):
             self.yspeed = 0
         else:
             self.y += self.yspeed
@@ -682,7 +721,7 @@ class Soul(Actor):
         self.solid = False
         self.color = (0, 255, 0)
         game.game_player = self
-        
+
         print(game.game_player)
 
         if not _arr:
@@ -708,16 +747,24 @@ class Soul(Actor):
             self.yspeed = 1
 
         # Attempt to move in the x-axis by xspeed
-        
-        if collision_check(pygame.Rect(self.shape.x + self.xspeed, self.shape.y, self.shape.w, self.shape.h)):
+
+        if collision_check(
+            pygame.Rect(
+                self.shape.x + self.xspeed, self.shape.y, self.shape.w, self.shape.h
+            )
+        ):
             self.xspeed = 0
         else:
             self.x += self.xspeed
             self.shape.topleft = self.x, self.y
-        
+
         # Attempt to move in the y-axis by yspeed
 
-        if collision_check(pygame.Rect(self.shape.x, self.shape.y + self.yspeed, self.shape.w, self.shape.h)):
+        if collision_check(
+            pygame.Rect(
+                self.shape.x, self.shape.y + self.yspeed, self.shape.w, self.shape.h
+            )
+        ):
             self.yspeed = 0
         else:
             self.y += self.yspeed
@@ -775,7 +822,7 @@ class Bullet(Actor):
         self.direction = 0
         self.shape = pygame.Rect(self.x, self.y, self.h, self.w)
         self.load_sprite(sprite_bullet, 4, 4)
-        
+
         if self.arr is not None:
             self.xspeed = self.arr[0][0]
             self.yspeed = self.arr[0][1]
@@ -799,9 +846,9 @@ class Bullet(Actor):
             if game.hurt_timer == 0:
                 game.health -= 1
                 game.hurt_timer = 60
-                
+
                 print(game.health)
-        
+
         self.x += self.xspeed
         self.y += self.yspeed
         self.shape.x = self.x
@@ -823,7 +870,9 @@ class Bullet(Actor):
     def typeof(self):
         return "Bullet"
 
+
 animation = {"events": []}
+
 
 class Attack:
     def __init__(self, _opponent, _timer=0):
@@ -837,9 +886,17 @@ class Attack:
                 spawn = i["spawn"]
                 for j in range(0, len(spawn)):
                     entity = spawn[j]["entity"]
-                    new_actor(entity["object"], entity["x"], entity["y"], entity["arr"], "actorlayer")
+                    new_actor(
+                        entity["object"],
+                        entity["x"],
+                        entity["y"],
+                        entity["arr"],
+                        "actorlayer",
+                    )
 
-    def construct_attack(self, _x, _y, _xspace, _yspace, _start, _wait, _number, _speed):
+    def construct_attack(
+        self, _x, _y, _xspace, _yspace, _start, _wait, _number, _speed
+    ):
         for i in range(0, _number):
             dic = {
                 "start": _start + i * _wait,
